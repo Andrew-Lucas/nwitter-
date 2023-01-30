@@ -3,12 +3,31 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GithubAuthProvider,
+  GoogleAuthProvider,
 } from "firebase/auth";
+import { async } from '@firebase/util';
+
+const errorFormat = (errMsg) =>{
+  if(!errMsg){
+    throw "You did not pass any arguements in 'errorFormat'"
+    return
+  }
+  if(typeof errMsg !== "string"){
+    throw "The arguement in 'errorFormat' must be a string"
+    return
+  }
+  const error = errMsg.substr(10, errMsg.length-10)
+  return error
+}
 
 const Auth = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [newAccount, setNewAccount] = useState(true)
+
+  const [error, setError] = useState("")
 
   const inputChange = (event) => {
     const {
@@ -25,23 +44,42 @@ const Auth = () => {
     event.preventDefault()
     try {
       let data;
+      let auth = getAuth()
       if (newAccount) {
         //create account
-        const auth = getAuth()
         data = await createUserWithEmailAndPassword(auth, email, password)
         console.log(data)
       } else {
         //login
-        const auth = getAuth()
         data = await signInWithEmailAndPassword(auth, email, password)
       }
-      console.log(data)
     } catch (err) {
-      console.log(err)
+      setError(errorFormat(err.message))
+      console.dir(err)
     }
   }
+  function toogleLoginOrSignin(){
+    return setNewAccount((prev)=> !prev)
+  }
+
+  const socialLogin = async (event)=>{
+    let auth = getAuth()
+    const {target:{name}} = event
+    console.log(name)
+    let provider;
+    if(name === "github"){
+      provider = new GithubAuthProvider()
+    } else if(name === "google"){
+      provider = new GoogleAuthProvider()
+    }
+    console.log(provider)
+    const data = await signInWithPopup(auth, provider)
+    console.log(data)
+  }
+
   return (
     <div>
+      {error ? <span>{error}</span> : null}
       <form onSubmit={formSubmit}>
         <input
           name="email"
@@ -65,12 +103,18 @@ const Auth = () => {
           required
         />
       </form>
+      {newAccount ? <>
+      <span>Already have an account? </span><span style={{color: "royalblue", cursor: 'pointer'}} onClick={toogleLoginOrSignin}>Login instead</span>
+      </> : <>
+      <span>Don't have an account? </span><span style={{color: "royalblue", cursor: 'pointer'}} onClick={toogleLoginOrSignin}>Create an account</span>
+      </>}
       <div>
-        <button>Continue with github</button>
-        <button>Continue with google</button>
+        <button onClick={socialLogin} name='github'>Continue with github</button>
+        <button onClick={socialLogin} name='google'>Continue with google</button>
       </div>
     </div>
   )
 }
 
 export default Auth
+
