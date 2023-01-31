@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GithubAuthProvider,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { async } from '@firebase/util';
+
+import { clientAuth } from '../firebase';
 
 const errorFormat = (errMsg) =>{
   if(!errMsg){
@@ -44,14 +44,13 @@ const Auth = () => {
     event.preventDefault()
     try {
       let data;
-      let auth = getAuth()
       if (newAccount) {
         //create account
-        data = await createUserWithEmailAndPassword(auth, email, password)
+        data = await createUserWithEmailAndPassword(clientAuth, email, password)
         console.log(data)
       } else {
         //login
-        data = await signInWithEmailAndPassword(auth, email, password)
+        data = await signInWithEmailAndPassword(clientAuth, email, password)
       }
     } catch (err) {
       setError(errorFormat(err.message))
@@ -63,7 +62,6 @@ const Auth = () => {
   }
 
   const socialLogin = async (event)=>{
-    let auth = getAuth()
     const {target:{name}} = event
     console.log(name)
     let provider;
@@ -73,7 +71,7 @@ const Auth = () => {
       provider = new GoogleAuthProvider()
     }
     console.log(provider)
-    const data = await signInWithPopup(auth, provider)
+    const data = await signInWithPopup(clientAuth, provider)
     console.log(data)
   }
 
@@ -117,4 +115,3 @@ const Auth = () => {
 }
 
 export default Auth
-

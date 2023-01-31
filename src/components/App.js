@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import AppRouter from './Router'
-import { getAuth } from 'firebase/auth'
+import { clientAuth } from '../firebase'
 
 function App() {
-  const auth = getAuth()
   const [init, setInit] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userObj, setUserObj] = useState(null)
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    clientAuth.onAuthStateChanged((user) => {
       if (user) {
         setIsLoggedIn(true)
+        setUserObj(user)
       } else {
         setIsLoggedIn(false)
       }
@@ -19,7 +20,7 @@ function App() {
   }, [])
   return (
     <>
-      {init ? <AppRouter isLoggedIn={isLoggedIn} /> : 'Initializing...'}
+      {init ? <AppRouter isLoggedIn={isLoggedIn} userObj={userObj} /> : 'Initializing...'}
     </>
   )
 }
