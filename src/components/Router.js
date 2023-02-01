@@ -8,7 +8,7 @@ import Navigation from './Navigation'
 const AppRouter = ({isLoggedIn, userObj}) => {
   console.log(userObj)
   return (
-    <Router>
+    <Router> 
       {isLoggedIn && <Navigation />}
       <Routes>
         <>
