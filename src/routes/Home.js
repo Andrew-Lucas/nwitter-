@@ -1,4 +1,4 @@
-import { getDownloadURL, ref, uploadString } from 'firebase/storage'
+/* import { getDownloadURL, ref, uploadString } from 'firebase/storage' */
 import React, { useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import Nweet from '../components/Nweet'
@@ -9,27 +9,37 @@ const Home = ({ userObj }) => {
   const [allNweets, setAllNweets] = useState([])
   const [atachement, setAtachement] = useState(null)
 
-  /*     const storageRef = ref(storage); */
-  
-  /*     const fileRef = storage.ref().child(`${userObj.uid}/${uuidv4()}`)
-  const response = await fileRef.putString(atachement, 'data_url')
-  console.log(await response.ref.getDownloadURL()) */
+  /*       const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`)
+
+      const response = await uploadString(fileRef, atachement, 'data_url')
+
+      const atachmentURL = await response.ref
+        .getDownloadURL(fileRef)
+        .then((response) => {
+          console.log(response)
+        }) */
 
   const formSubmit = async (event) => {
     event.preventDefault()
-    const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
-    await uploadString(fileRef, atachement, 'data_url').then((snapshot)=> {
-      console.log('Uploaded a data_url string!', snapshot);
-    });
-    await getDownloadURL(fileRef).then((response)=>{
-      console.log(response)
-    })
-    /*     await Db.collection('nweets').add({
-      nweet,
-      createdAt: Date.now(),
-      ownerId: userObj.uid,
-    })
-    setNweet('') */
+    try {
+      let atachementURL
+      if(atachement){
+        const fileRef = storage.ref().child(`${userObj.uid}/${uuidv4()}`)
+        const response = await fileRef.putString(atachement, 'data_url')
+        atachementURL = await response.ref.getDownloadURL()
+      }
+      const newNweet = {
+        nweet,
+        createdAt: Date.now(),
+        ownerId: userObj.uid,
+        atachementURL: atachementURL ? atachementURL : ""
+      }
+      await Db.collection('nweets').add(newNweet)
+      setNweet('')
+      setAtachement("")
+    } catch (err) {
+      console.log('Console logged error:: ', err)
+    }
   }
 
   useEffect(() => {

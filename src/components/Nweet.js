@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Db } from '../firebase'
+import { Db, storage } from '../firebase'
 
 const Nweet = ({ nweetObj, owner }) => {
   const [editing, setEditing] = useState(false)
@@ -36,6 +36,7 @@ const Nweet = ({ nweetObj, owner }) => {
     )
     if (confirmed) {
       await Db.doc(`nweets/${nweetObj.id}`).delete()
+      await storage.refFromURL(nweetObj.atachementURL).delete()
     }
   }
   return (
@@ -57,6 +58,14 @@ const Nweet = ({ nweetObj, owner }) => {
         ) : (
           <>
             <h4>{nweetObj.nweet}</h4>
+            {nweetObj.atachementURL !== '' && (
+              <img
+                alt=""
+                src={nweetObj.atachementURL}
+                height="100"
+                width="100"
+              />
+            )}
             {owner ? (
               <>
                 <button onClick={toogleEditing}>Edit</button>
