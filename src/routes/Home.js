@@ -9,39 +9,6 @@ const Home = ({ userObj }) => {
   const [allNweets, setAllNweets] = useState([])
   const [atachement, setAtachement] = useState(null)
 
-  /*       const fileRef = ref(storage, `${userObj.uid}/${uuidv4()}`)
-
-      const response = await uploadString(fileRef, atachement, 'data_url')
-
-      const atachmentURL = await response.ref
-        .getDownloadURL(fileRef)
-        .then((response) => {
-          console.log(response)
-        }) */
-
-  const formSubmit = async (event) => {
-    event.preventDefault()
-    try {
-      let atachementURL
-      if(atachement){
-        const fileRef = storage.ref().child(`${userObj.uid}/${uuidv4()}`)
-        const response = await fileRef.putString(atachement, 'data_url')
-        atachementURL = await response.ref.getDownloadURL()
-      }
-      const newNweet = {
-        nweet,
-        createdAt: Date.now(),
-        ownerId: userObj.uid,
-        atachementURL: atachementURL ? atachementURL : ""
-      }
-      await Db.collection('nweets').add(newNweet)
-      setNweet('')
-      setAtachement("")
-    } catch (err) {
-      console.log('Console logged error:: ', err)
-    }
-  }
-
   useEffect(() => {
     Db.collection('nweets').onSnapshot((snapshots) => {
       const nweetArray = snapshots.docs.map((doc) => ({
@@ -82,6 +49,35 @@ const Home = ({ userObj }) => {
     setAtachement(null)
     atachementInput.current.value = ''
   }
+
+  const formSubmit = async (event) => {
+    event.preventDefault()
+    if (nweet !== '') {
+      try {
+        let atachementURL
+        if (atachement) {
+          const fileRef = storage.ref().child(`${userObj.uid}/${uuidv4()}`)
+          const response = await fileRef.putString(atachement, 'data_url')
+          atachementURL = await response.ref.getDownloadURL()
+        }
+        const newNweet = {
+          nweet,
+          createdAt: Date.now(),
+          ownerId: userObj.uid,
+          ownerProfilePicture: userObj.photoURL,
+          ownerUsername: userObj.displayName,
+          atachementURL: atachementURL ? atachementURL : '',
+        }
+        await Db.collection('nweets').add(newNweet)
+        atachementInput.current.value = ''
+        setNweet('')
+        setAtachement('')
+      } catch (err) {
+        console.log('Console logged error:: ', err)
+      }
+    }
+  }
+
   return (
     <div>
       <form onSubmit={formSubmit}>
@@ -106,13 +102,17 @@ const Home = ({ userObj }) => {
         <button>Nweet</button>
       </form>
       <div>
-        {allNweets.map((nweet) => (
-          <Nweet
-            key={nweet.id}
-            nweetObj={nweet}
-            owner={String(nweet.ownerId) === String(userObj.uid)}
-          />
-        ))}
+        {allNweets.map((nweet) => {
+          console.log(nweet.id)
+          return (
+            <Nweet
+              onFileChange={onFileChange}
+              key={nweet.id}
+              nweetObj={nweet}
+              owner={String(nweet.ownerId) === String(userObj.uid)}
+            />
+          )
+        })}
       </div>
     </div>
   )

@@ -1,3 +1,5 @@
+/* eslint-disable no-unreachable */
+/* eslint-disable no-throw-literal */
 import React, { useState } from 'react'
 import {
   createUserWithEmailAndPassword,
@@ -5,20 +7,20 @@ import {
   signInWithPopup,
   GithubAuthProvider,
   GoogleAuthProvider,
-} from "firebase/auth";
+} from 'firebase/auth'
 
-import { clientAuth } from '../firebase';
+import { clientAuth } from '../firebase'
 
-const errorFormat = (errMsg) =>{
-  if(!errMsg){
+const errorFormat = (errMsg) => {
+  if (!errMsg) {
     throw "You did not pass any arguements in 'errorFormat'"
     return
   }
-  if(typeof errMsg !== "string"){
+  if (typeof errMsg !== 'string') {
     throw "The arguement in 'errorFormat' must be a string"
     return
   }
-  const error = errMsg.substr(10, errMsg.length-10)
+  const error = errMsg.substr(10, errMsg.length - 10)
   return error
 }
 
@@ -27,7 +29,7 @@ const Auth = () => {
   const [password, setPassword] = useState('')
   const [newAccount, setNewAccount] = useState(true)
 
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
   const inputChange = (event) => {
     const {
@@ -43,7 +45,7 @@ const Auth = () => {
   const formSubmit = async (event) => {
     event.preventDefault()
     try {
-      let data;
+      let data
       if (newAccount) {
         //create account
         data = await createUserWithEmailAndPassword(clientAuth, email, password)
@@ -57,17 +59,19 @@ const Auth = () => {
       console.dir(err)
     }
   }
-  function toogleLoginOrSignin(){
-    return setNewAccount((prev)=> !prev)
+  function toogleLoginOrSignin() {
+    return setNewAccount((prev) => !prev)
   }
 
-  const socialLogin = async (event)=>{
-    const {target:{name}} = event
+  const socialLogin = async (event) => {
+    const {
+      target: { name },
+    } = event
     console.log(name)
-    let provider;
-    if(name === "github"){
+    let provider
+    if (name === 'github') {
       provider = new GithubAuthProvider()
-    } else if(name === "google"){
+    } else if (name === 'google') {
       provider = new GoogleAuthProvider()
     }
     console.log(provider)
@@ -101,14 +105,32 @@ const Auth = () => {
           required
         />
       </form>
-      {newAccount ? <>
-      <span>Already have an account? </span><span style={{color: "royalblue", cursor: 'pointer'}} onClick={toogleLoginOrSignin}>Login instead</span>
-      </> : <>
-      <span>Don't have an account? </span><span style={{color: "royalblue", cursor: 'pointer'}} onClick={toogleLoginOrSignin}>Create an account</span>
-      </>}
+      {newAccount ? (
+        <>
+          <span>Already have an account? </span>
+          <span
+            style={{ color: 'royalblue', cursor: 'pointer' }}
+            onClick={toogleLoginOrSignin}>
+            Login instead
+          </span>
+        </>
+      ) : (
+        <>
+          <span>Don't have an account? </span>
+          <span
+            style={{ color: 'royalblue', cursor: 'pointer' }}
+            onClick={toogleLoginOrSignin}>
+            Create an account
+          </span>
+        </>
+      )}
       <div>
-        <button onClick={socialLogin} name='github'>Continue with github</button>
-        <button onClick={socialLogin} name='google'>Continue with google</button>
+        <button onClick={socialLogin} name="github">
+          Continue with github
+        </button>
+        <button onClick={socialLogin} name="google">
+          Continue with google
+        </button>
       </div>
     </div>
   )

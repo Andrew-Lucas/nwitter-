@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { useRef, useState } from 'react'
 import { Db, storage } from '../firebase'
 
-const Nweet = ({ nweetObj, owner }) => {
+const Nweet = ({ nweetObj, owner, onFileChange }) => {
   const [editing, setEditing] = useState(false)
   const [nweetUpdate, setNweetUpdate] = useState(nweetObj.nweet)
 
@@ -16,9 +18,15 @@ const Nweet = ({ nweetObj, owner }) => {
     setNweetUpdate(value)
   }
 
+  const editAtachementInput = useRef()
+  if (editing && owner) {
+    console.log(editAtachementInput)
+  }
+
   const [edited, setEdited] = useState(false)
   async function editTweetSubmit(event) {
     event.preventDefault()
+    console.log(nweetObj)
     await Db.doc(`nweets/${nweetObj.id}`).update({
       nweet: nweetUpdate,
     })
@@ -35,10 +43,14 @@ const Nweet = ({ nweetObj, owner }) => {
       'Are you sure you want to delete this tweet?'
     )
     if (confirmed) {
+      console.log(nweetObj)
       await Db.doc(`nweets/${nweetObj.id}`).delete()
       await storage.refFromURL(nweetObj.atachementURL).delete()
     }
   }
+
+/*   console.log(nweetObj.ownerProfilePicture) */
+
   return (
     <div>
       {owner && edited && <span>Edited!!!</span>}
@@ -46,6 +58,12 @@ const Nweet = ({ nweetObj, owner }) => {
         {editing && owner ? (
           <>
             <form onSubmit={editTweetSubmit}>
+              <input
+                ref={editAtachementInput}
+                onChange={onFileChange}
+                type="file"
+                accept="image/*"
+              />
               <input
                 value={nweetUpdate}
                 onChange={editTweetInput}
@@ -57,6 +75,21 @@ const Nweet = ({ nweetObj, owner }) => {
           </>
         ) : (
           <>
+            {nweetObj.ownerProfilePicture || nweetObj.ownerProfilePicture === '' ? (
+              <>
+                <img
+                  alt=""
+                  src={nweetObj.ownerProfilePicture}
+                  height="50"
+                  width="50"
+                />
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faUser} />
+              </>
+            )}
+            <span>{nweetObj.ownerUsername}</span>
             <h4>{nweetObj.nweet}</h4>
             {nweetObj.atachementURL !== '' && (
               <img
