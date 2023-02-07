@@ -1,13 +1,12 @@
 /* import { getDownloadURL, ref, uploadString } from 'firebase/storage' */
-import React, { useEffect, useRef, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import Nweet from '../components/Nweet'
-import { Db, storage } from '../firebase'
+import React, { useEffect, useState } from 'react'
+import CreateNweetsForm from '../components/homeComponents/CreateNweetsForm'
+import NweetEditAndDisplay from '../components/homeComponents/NweetEditAndDisplay'
+import { Db } from '../firebase'
 
 const Home = ({ userObj }) => {
   const [nweet, setNweet] = useState('')
   const [allNweets, setAllNweets] = useState([])
-  const [atachement, setAtachement] = useState(null)
 
   useEffect(() => {
     Db.collection('nweets').onSnapshot((snapshots) => {
@@ -20,16 +19,9 @@ const Home = ({ userObj }) => {
     })
   }, [])
 
-  const inputChange = (event) => {
+  const onFileChange = (setFile, event, stateSeter = '') => {
     const {
-      target: { value },
-    } = event
-    setNweet(value)
-  }
-
-  const onFileChange = (event) => {
-    const {
-      target: { files },
+      current: { files },
     } = event
     const fileToRead = files[0]
     const reader = new FileReader()
@@ -39,73 +31,28 @@ const Home = ({ userObj }) => {
         const {
           currentTarget: { result },
         } = finishedEvent
-        setAtachement(result)
+        setFile(result)
+        if (typeof stateSeter === 'function') {
+          stateSeter(result)
+        }
       }
     }
   }
 
-  const atachementInput = useRef()
-  const clearAttachement = () => {
-    setAtachement(null)
-    atachementInput.current.value = ''
-  }
-
-  const formSubmit = async (event) => {
-    event.preventDefault()
-    if (nweet !== '') {
-      try {
-        let atachementURL
-        if (atachement) {
-          const fileRef = storage.ref().child(`${userObj.uid}/${uuidv4()}`)
-          const response = await fileRef.putString(atachement, 'data_url')
-          atachementURL = await response.ref.getDownloadURL()
-        }
-        const newNweet = {
-          nweet,
-          createdAt: Date.now(),
-          ownerId: userObj.uid,
-          ownerProfilePicture: userObj.photoURL,
-          ownerUsername: userObj.displayName,
-          atachementURL: atachementURL ? atachementURL : '',
-        }
-        await Db.collection('nweets').add(newNweet)
-        atachementInput.current.value = ''
-        setNweet('')
-        setAtachement('')
-      } catch (err) {
-        console.log('Console logged error:: ', err)
-      }
-    }
-  }
+  console.log(userObj.uid)
 
   return (
     <div>
-      <form onSubmit={formSubmit}>
-        <input
-          value={nweet}
-          onChange={inputChange}
-          type="text"
-          placeholder="Whats on your mind?"
-        />
-        <input
-          ref={atachementInput}
-          onChange={onFileChange}
-          type="file"
-          accept="image/*"
-        />
-        {atachement && (
-          <>
-            <img src={atachement} height="100px" width="100px" alt="" />
-            <button onClick={clearAttachement}>Clear Image</button>
-          </>
-        )}
-        <button>Nweet</button>
-      </form>
+      <CreateNweetsForm
+        nweet={nweet}
+        setNweet={setNweet}
+        userObj={userObj}
+        onFileChange={onFileChange}
+      />
       <div>
         {allNweets.map((nweet) => {
-          console.log(nweet.id)
           return (
-            <Nweet
+            <NweetEditAndDisplay
               onFileChange={onFileChange}
               key={nweet.id}
               nweetObj={nweet}
