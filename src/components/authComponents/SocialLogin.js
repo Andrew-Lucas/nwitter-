@@ -10,14 +10,12 @@ const SocialLogin = () => {
     const {
       target: { name },
     } = event
-    console.log(name)
     let provider
     if (name === 'github') {
       provider = new GithubAuthProvider()
     } else if (name === 'google') {
       provider = new GoogleAuthProvider()
     }
-    console.log(provider)
     const data = await signInWithPopup(clientAuth, provider)
     console.log(data)
   }

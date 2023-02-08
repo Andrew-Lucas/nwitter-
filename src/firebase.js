@@ -2,8 +2,7 @@ import firebase from 'firebase/compat/app'
 import { getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import 'firebase/compat/firestore'
-import "firebase/compat/storage"
-/* import { getStorage } from 'firebase/storage' */
+import 'firebase/compat/storage'
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -12,10 +11,8 @@ const firebaseConfig = {
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_MESSAGING_ID,
   appId: process.env.REACT_APP_APP_ID,
-  measurementId: process.env.REACT_APP_MEASUREMENT_ID
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 }
-
-/* export default firebase.initializeApp(firebaseConfig); */
 
 const initializeAppIfNecessary = () => {
   try {
@@ -28,5 +25,4 @@ let app = initializeAppIfNecessary()
 
 export const clientAuth = getAuth(app)
 export const Db = firebase.firestore()
-/* export const storage = getStorage(app); */
 export const storage = firebase.storage()

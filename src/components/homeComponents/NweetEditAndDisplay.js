@@ -17,12 +17,10 @@ const NweetEditAndDisplay = ({ nweetObj, owner, onFileChange }) => {
   async function editTweetSubmit(event) {
     event.preventDefault()
     console.log(nweetObj)
-    console.log('In edit Tweet 1::', currentPhoto)
     await Db.doc(`nweets/${nweetObj.id}`).update({
       nweet: nweetUpdate,
       atachementURL: currentPhoto !== '' ? currentPhoto : '',
     })
-    console.log('In edit Tweet 2::', currentPhoto)
     setEditing(false)
     setEdited(true)
 
@@ -32,11 +30,12 @@ const NweetEditAndDisplay = ({ nweetObj, owner, onFileChange }) => {
   }
 
   return (
-    <div style={{
-      borderTop: 'solid 1px lightgrey',
-      margin: '7px 0px',
-      padding: '5px',
-    }}>
+    <div
+      style={{
+        borderTop: 'solid 1px lightgrey',
+        margin: '7px 0px',
+        padding: '5px',
+      }}>
       {owner && edited && <span>Edited!!!</span>}
       <>
         {editing && owner ? (

@@ -9,7 +9,6 @@ const DisplayNweets = ({ nweetObj, toogleEditing, owner }) => {
       'Are you sure you want to delete this tweet?'
     )
     if (confirmed) {
-      console.log(nweetObj)
       await Db.doc(`nweets/${nweetObj.id}`).delete()
       await storage.refFromURL(nweetObj.atachementURL).delete()
     }

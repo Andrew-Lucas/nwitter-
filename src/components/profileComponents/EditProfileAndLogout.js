@@ -70,7 +70,6 @@ const EditProfileAndLogout = ({
         const fileRef = storage.ref().child(`${userObj.uid}/profilePhotoURL`)
         const response = await fileRef.putString(currentPhoto, 'data_url')
         currentPhotoURL = await response.ref.getDownloadURL()
-        console.log(currentPhotoURL)
       }
       console.log(updateCurrentUser, updateProfile)
       await updateProfile(clientAuth.currentUser, {
@@ -86,7 +85,6 @@ const EditProfileAndLogout = ({
       //Update this users nweets
       myNweets.forEach((eachNweet) => {
         myNweetsIds.forEach(async (id) => {
-          console.log('An ID', id)
           await Db.doc(`nweets/${id}`).update({
             ownerProfilePicture: userObj.photoURL,
             ownerUsername: userObj.displayName
@@ -108,31 +106,66 @@ const EditProfileAndLogout = ({
       <form onSubmit={formSubmit}>
         {currentPhoto ? (
           <>
-            <img style={{borderRadius: "50%"}} src={currentPhoto} height="100px" width="100px" alt="" />
+            <img
+              style={{ borderRadius: '50%', marginBottom: '15px' }}
+              src={currentPhoto}
+              height="100px"
+              width="100px"
+              alt=""
+            />
             <br></br>
-            <button onClick={removePhotoURL}>Remove Profile Photo</button>
           </>
         ) : (
           <>
-            <FontAwesomeIcon icon={faUser} size="5x" />
+            <FontAwesomeIcon
+              icon={faUser}
+              size="5x"
+              style={{ marginBottom: '15px' }}
+            />
+            <br></br>
           </>
         )}
 
+        <label
+          htmlFor="choose-photo"
+          style={{
+            backgroundColor: 'ghostwhite',
+            padding: '2px 5px',
+            border: 'solid 1px grey',
+            borderRadius: '3px',
+          }}>
+          {userObj.photoURL && userObj.photoURL !== ''
+            ? 'Change profile photo'
+            : 'Choose Photo'}
+        </label>
         <input
+          style={{ display: 'none' }}
+          id="choose-photo"
           onChange={onFileChange}
           type="file"
           accept="image/*"
           ref={photoUrl}
         />
+        {userObj.photoURL && userObj.photoURL !== '' && (
+          <button onClick={removePhotoURL}>Remove Profile Photo</button>
+        )}
+        <br></br>
+        <br></br>
         <input
           type="text"
           value={inputValue ? inputValue : ''}
           placeholder="Write your Username"
           onChange={inputChange}
         />
-        <input type="submit" value="Update Profile"></input>
+        <input
+          style={{ color: 'green' }}
+          type="submit"
+          value="Update Profile"></input>
       </form>
-      <button style={{color: "red"}} onClick={onLogout}>Logout</button>
+      <br></br>
+      <button style={{ color: 'red' }} onClick={onLogout}>
+        Logout
+      </button>
     </>
   )
 }

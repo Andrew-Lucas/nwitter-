@@ -39,8 +39,6 @@ const Home = ({ userObj }) => {
     }
   }
 
-  console.log(userObj.uid)
-
   return (
     <div>
       <CreateNweetsForm
